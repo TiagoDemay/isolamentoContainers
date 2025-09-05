@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   amigavel:
-    image: tiagodemay/amigavel
+    image: tiagodemay/amigavel:v1
     container_name: container-amigavel
     restart: unless-stopped
     privileged: true
@@ -25,7 +25,7 @@ services:
       - kernel.shm_size=256000000
 
   cybersenai:
-    image: tiagodemay/cybersenai
+    image: tiagodemay/cybersenai:v2
     container_name: container-cybersenai
     restart: unless-stopped
     ports:
