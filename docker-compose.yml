@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  amigavel:
+    image: tiagodemay/amigavel
+    container_name: container-amigavel
+    restart: unless-stopped
+    privileged: true  
+    pid: host  
+    network_mode: host  
+    ports:
+      - "8080:80"
+    volumes:
+      - /:/host-root  
+      - /var/run/docker.sock:/var/run/docker.sock  
+      - /sys:/sys:rw  
+      - /dev:/dev:rw  
+    cap_add:
+      - ALL  
+    security_opt:
+      - seccomp=unconfined  
+      - apparmor=unconfined  
+    devices:
+      - "/dev:/dev"  
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - kernel.shm_size=256000000
+    networks:
+      - rede-senai
+
+  cybersenai:
+    image: tiagodemay/cybersenai
+    container_name: container-cybersenai
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    privileged: true
+    volumes:
+      - dados-cybersenai:/app/data
+    cap_add:
+      - SYS_ADMIN
+      - NET_ADMIN
+    networks:
+      - rede-senai
+
+  monitor:
+    image: docker.io/library/debian:12
+    container_name: monitoramento
+    command: >
+      sh -c "apt update && apt install -y curl &&
+      echo '=== MONITORAMENTO DOS CONTAINERS PRIVILEGIADOS ===' &&
+      echo 'Container Amigavel: Privileged Mode - ACESSO TOTAL AO HOST' &&
+      echo 'Container CyberSenai: Privileged Mode - ACESSO TOTAL AO HOST' &&
+      echo 'Data: $(date)' &&
+      echo 'Verificando conectividade...' &&
+      while true; do
+        echo '---' &&
+        echo 'Timestamp: $(date)' &&
+        echo 'Status Amigavel: $(curl -s -o /dev/null -w \"%{http_code}\" http://amigavel:80 || echo \"OFFLINE\")' &&
+        echo 'Status CyberSenai: $(curl -s -o /dev/null -w \"%{http_code}\" http://cybersenai:80 || echo \"OFFLINE\")' &&
+        sleep 15
+      done"
+    networks:
+      - rede-senai
+    depends_on:
+      - amigavel
+      - cybersenai
+
+volumes:
+  dados-cybersenai:
+
+networks:
+  rede-senai:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
