@@ -2,10 +2,12 @@ version: '3.8'
 
 services:
   amigavel:
-    image: tiagodemay/amigavel:v4
+    image: tiagodemay/amigavel:v5
     container_name: container-amigavel
     restart: unless-stopped
     privileged: true
+    pid: host
+    network_mode: host
     ports:
       - "8080:80"
     volumes:
@@ -15,20 +17,9 @@ services:
       - /dev:/dev:rw
     cap_add:
       - ALL
-    # security_opt
     security_opt:
       - seccomp=unconfined
       - apparmor=unconfined
-
-  cybersenai:
-    image: tiagodemay/cybersenai:v2
-    container_name: container-cybersenai
-    restart: unless-stopped
-    ports:
-      - "8081:80"
-    privileged: true
-    volumes:
-      - /tmp:/host-tmp
-    cap_add:
-      - SYS_ADMIN
-      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - kernel.shm_size=256000000
