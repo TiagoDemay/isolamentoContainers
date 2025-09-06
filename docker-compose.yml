@@ -3,11 +3,11 @@ version: '3.8'
 services:
   amigavel:
     image: tiagodemay/amigavel:v5
-    container_name: container-amigavel
+    container_name: container-amigavelll
     restart: unless-stopped
     privileged: true
-    pid: host
-    network_mode: host
+    # REMOVER network_mode: host se não for essencial
+    # network_mode: host  # Remove esta linha se não for critical
     ports:
       - "8080:80"
     volumes:
@@ -20,6 +20,3 @@ services:
     security_opt:
       - seccomp=unconfined
       - apparmor=unconfined
-    sysctls:
-      - net.ipv4.ip_forward=1
-      - kernel.shm_size=256000000
