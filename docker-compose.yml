@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   amigavel:
-    image: tiagodemay/amigavel:v4
+    image: tiagodemay/amigavel:v10
     container_name: container-amigavelll
     restart: unless-stopped
     privileged: true
